@@ -30,13 +30,13 @@ public:
 		return sock;
 	}
 
-	int fp2pSend(unsiged long target_id, std::string msg){
+	int fp2pSend(unsigned long target_id, std::string msg){
 
 		// Fill up serverAddress details using target_id and host information
 		sockaddr_in serverAddress;
 		serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(id_to_host[target_id].portReadable());
-    serverAddress.sin_addr.s_addr = inet_addr(id_to_host[target_id].ipReadable().c_str());
+		serverAddress.sin_port = htons(id_to_host[target_id].portReadable());
+		serverAddress.sin_addr.s_addr = inet_addr(id_to_host[target_id].ipReadable().c_str());
 
 		std::lock_guard<std::mutex> lock(socketLock);
 		if(sendto(sock, msg.c_str(), msg.length(), 0, reinterpret_cast<struct sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1){

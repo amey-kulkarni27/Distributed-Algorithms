@@ -4,11 +4,13 @@
 #include <string>
 #include <set>
 #include <cassert>
+#include <mutex>
 
 #include "parser.hpp"
 #include "Helper.hpp"
 
 #include "Stubborn.hpp"
+#include "FLSend.hpp"
 
 class PLBroadcast{
 	
@@ -24,6 +26,14 @@ public:
 		}
 	}
 
+	FLSend getFLSend(){
+		return (this->s).getFLSend();
+	}
+
+	Stubborn getStubborn(){
+		return this->s;
+	}
+
 	int getSocket(){
 		return (this->s).getSocket();
 	}
@@ -31,6 +41,7 @@ public:
 	void broadcast(std::string msg){
 		// append pl_id to the start of the message so that the receiver knows
 		// get stubborn links to infinitely send that message
+		const std::lock_guard<std::mutex> lock(broadcastLock);
 		for(const &int h_id: ids){
 			msg = std::to_string(pl_ids[h_id]) + "_" + msg;
 			(this->s).sp2pSend(h_id, pl_ids[h_id], msg);
@@ -48,5 +59,6 @@ private:
 	const unsigned long id;
 	map<unsigned long, unsigned long long> pl_ids;
 	std::vector<unsigned long> ids;
+	std::mutex broadcastLock; // Since both URBSend and URBReceive call this broadcast function
 
 };

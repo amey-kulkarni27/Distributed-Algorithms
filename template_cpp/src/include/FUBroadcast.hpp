@@ -9,6 +9,8 @@
 #include "Helper.hpp"
 
 #include "PLBroadcast.hpp"
+#include "Stubborn.hpp"
+#include "FLSend.hpp"
 
 class FUBroadcast{
 	
@@ -16,6 +18,17 @@ public:
 
 	FUBroadcast(unsigned long id_, std::vector<Parser::Host> hosts) : plb(id_, hosts), id(id_){
 	}
+
+	FLSend getFLSend(){
+		return (this->plb).getFLSend();
+	}
+
+	Stubborn getStubborn(){
+		return (this->plb).getStubborn();
+	}
+
+	PLBroadcast getPLBroadcast(){
+		return (this->plb);
 
 	int getSocket(){
 		return (this->plb).getSocket();

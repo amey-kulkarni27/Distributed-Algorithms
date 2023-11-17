@@ -25,6 +25,10 @@ public:
 		contSending.detach();
 	}
 
+	FLSend getFLSend(){
+		return (this->fls);
+	}
+
 	int getSocket(){
 		return (this->fls).getSocket();
 	}
