@@ -34,7 +34,7 @@ public:
 		}
 	}
 
-	static Parser::Host getReceiverInfo(std::vector<Parser::Host> hosts, unsigned long target){
+	static Parser::Host getInfo(std::vector<Parser::Host> hosts, unsigned long target){
 		Parser::Host dummy;
 		for (auto &host : hosts)
 		if(host.id == target)
@@ -43,14 +43,14 @@ public:
 		return dummy;
 	}
 
- 	static bool readParams (const char *configPath, unsigned long &num_messages, unsigned long &target){
+ 	static bool readParams (const char *configPath, unsigned long &num_messages){
 		std::ifstream configFile(configPath);
 
 		if(configFile.is_open()){
 			std::string firstLine;
 			if(getline(configFile, firstLine)){
 				std::istringstream iss(firstLine);
-				if(iss>>num_messages>>target){
+				if(iss>>num_messages){
 					return true;
 				}
 				else

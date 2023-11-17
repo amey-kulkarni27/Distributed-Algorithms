@@ -7,11 +7,9 @@
 #include "hello.h"
 #include <signal.h>
 
-#include "HandlerSender1.hpp"
-#include "HandlerReceiver1.hpp"
+#include "Handler.hpp"
 
-HandlerSender1 *sendPtr = nullptr;
-HandlerReceiver1 *receivePtr = nullptr;
+Handler* hptr = nullptr;
 
 static void stop(int) {
   // reset signal handlers to default
@@ -20,11 +18,7 @@ static void stop(int) {
 
   // immediately stop network packet processing
   std::cout << "Immediately stopping network packet processing.\n";
-	if(receivePtr	!= nullptr){
-		receivePtr -> stopExchange();
-	}
-	if(sendPtr != nullptr)
-		sendPtr -> stopExchange();
+	hptr -> stopExchange();
 
   // write/flush output file if necessary
   std::cout << "Writing output.\n";
@@ -76,38 +70,29 @@ int main(int argc, char **argv) {
   std::cout << parser.configPath() << "\n\n";
 
 	// Finding out the parameters
-	unsigned long target, num_messages;
+	unsigned long num_messages;
+
+	// Remove log file if already exists
 	Helper::removeFile(parser.outputPath());
-	if(Helper::readParams(parser.configPath(), num_messages, target) == false)
+
+	if(Helper::readParams(parser.configPath(), num_messages) == false)
 		std::cerr<<"Failed to read parameters from the config file "<<std::endl;
 
-	Parser::Host targetDetails = Helper::getReceiverInfo(hosts, target);
-	
   std::cout << "Doing some initialization...\n\n";
 
 	unsigned long curId = parser.id();
-	if(curId == target){
-		HandlerReceiver1 h(parser.outputPath(), targetDetails.ipReadable().c_str(), targetDetails.portReadable());
-		receivePtr = &h;
-		while (true) {
-			std::this_thread::sleep_for(std::chrono::hours(1));
-		}
-	}
-	else{
-		Parser::Host curDetails = Helper::getReceiverInfo(hosts, curId);
-		HandlerSender1 h(curId, parser.outputPath(), num_messages, target, targetDetails.ipReadable().c_str(), targetDetails.portReadable(), curDetails.ipReadable().c_str(), curDetails.portReadable());
-		// std::this_thread::sleep_for(std::chrono::seconds(1));
-		std::cout << "Broadcasting and delivering messages...\n\n";
-		sendPtr = &h;
-		h.startExchange();
-		while (true) {
-			std::this_thread::sleep_for(std::chrono::hours(1));
-		}
-	}
-
+	Parser::Host curDetails = Helper::getReceiverInfo(hosts, curId);
+	Handler h(curId, parser.outputPath(), num_messages, hosts);
+	// std::this_thread::sleep_for(std::chrono::seconds(1));
+	std::cout << "Broadcasting and delivering messages...\n\n";
+	hptr = &h;
+	h.startExchange();
 
   // After a process finishes broadcasting,
   // it waits forever for the delivery of messages.
+	while (true) {
+		std::this_thread::sleep_for(std::chrono::hours(1));
+	}
 
   return 0;
 }

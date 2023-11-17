@@ -11,16 +11,14 @@
 #include "parser.hpp"
 #include "Helper.hpp"
 
-#include "FLSenderSend.hpp"
+#include "FLSend.hpp"
 
 class Stubborn{
 
 public:
-	std::unordered_map<unsigned long, std::string> tsToMsg;
 
 	// Using a member initialiser list to 
-	Stubborn(const char *ip, unsigned short port) :fss(ip, port){
-		prt = port;
+	Stubborn(std::vector<Parser::Host> hosts) :fls(hosts){
 
 		// use a separate thread
 		std::thread contSending(&Stubborn::continuousSend, this);
@@ -28,26 +26,27 @@ public:
 	}
 
 	int getSocket(){
-		return (this->fss).getSocket();
+		return (this->fls).getSocket();
 	}
 
-	void sp2pSend(unsigned long ts, std::string msg){
+	void sp2pSend(unsigned long h_id, unsigned long long ts, std::string msg){
 		const std::lock_guard<std::mutex> lock(mapLock);
-		tsToMsg[ts] = msg;
+		tsToMsg[make_pair(h_id, ts)] = msg;
 	}
 
-	void sp2pStop(unsigned long ts){
+	void sp2pStop(unsigned long h_id, unsigned long long ts){
 		const std::lock_guard<std::mutex> lock(mapLock);
-		tsToMsg.erase(ts);
+		tsToMsg.erase(make_pair(h_id, ts));
 	}
 
 	void stopAll(){
 		keep_sending = false;
-		(this->fss).stopAll();
+		(this->fls).stopAll();
 	}
 
 private:
-	FLSenderSend fss;
+	std::unordered_map<pair<unsigned long, unsigned long long>, std::string> tsToMsg;
+	FLSend fls;
 	std::mutex mapLock;
 	bool keep_sending = true;
 	unsigned short prt = 0;
@@ -56,9 +55,8 @@ private:
 		const std::lock_guard<std::mutex> lock(mapLock);
 		if(tsToMsg.size() == 0)
 			return 0;
-		// std::cout<<"THREAD: "<<tsToMsg.size()<<std::endl;
 		for(auto const& [key, val]: tsToMsg){
-			if((this->fss).fp2pSend(val) == -1)
+			if((this->fls).fp2pSend(key.first, val) == -1) // if the port is closed by the main thread
 				return 0;
 		}
 		return 1;
@@ -70,6 +68,5 @@ private:
 			if(flood() == 0)
 				std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 		}
-		// Helper::printText("Cont Send Thread terminates");
 	}
 };
