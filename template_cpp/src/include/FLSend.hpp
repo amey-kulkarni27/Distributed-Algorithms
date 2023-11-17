@@ -5,15 +5,16 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cassert>
+#include <mutex>
 
 #include "parser.hpp"
 #include "Helper.hpp"
 
 
-class FLSenderSend{
+class FLSend{
 
 public:
-	FLSenderSend(std::vector<Parser::Host> hosts_){
+	FLSend(std::vector<Parser::Host> hosts_){
 
 		for(auto host: hosts_)
 			id_to_host[host.id] = host;
@@ -22,7 +23,6 @@ public:
 		if(sock == -1){
         perror("Failed to create socket");
     }
-
 
 	}
 
@@ -33,10 +33,12 @@ public:
 	int fp2pSend(unsiged long target_id, std::string msg){
 
 		// Fill up serverAddress details using target_id and host information
+		sockaddr_in serverAddress;
 		serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(id_to_host[target_id].portReadable());
     serverAddress.sin_addr.s_addr = inet_addr(id_to_host[target_id].ipReadable().c_str());
 
+		std::lock_guard<std::mutex> lock(socketLock);
 		if(sendto(sock, msg.c_str(), msg.length(), 0, reinterpret_cast<struct sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1){
 			perror("Error while sending the message.\n");
 			return -1;
@@ -56,5 +58,6 @@ public:
 
 private:
 	std::unordered_map<unsigned long, Parser::Host> id_to_host;
+	std::mutex socketLock;
 
 };
