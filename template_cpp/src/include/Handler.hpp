@@ -22,7 +22,7 @@ class Handler{
 public:
 
 	// Constructor named initialise, because we wanted to create a global object
-	Handler(unsigned long id, const char *outputPath, unsigned long num_messages_, std::vector<Parser::Host> hosts) : fub(id, hosts), flr(&((this->fub).s), (this->fub).getSocket(), curId, hosts), filePath(outputPath), outputFile(filePath){
+	Handler(unsigned long id, const char *outputPath, unsigned long num_messages_, std::vector<Parser::Host> hosts) : fub(id, hosts), flr(&((this->fub).getFLSend()), &((this->fub).getStubborn()), &((this->fub).getPLBroadcast()), (this->fub).getSocket(), curId, hosts), filePath(outputPath), outputFile(filePath){
 		num_messages = num_messages_;
 
 		createFile();
