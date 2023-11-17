@@ -6,15 +6,17 @@
 #include <unistd.h>
 #include <thread>
 
-#include <parser.hpp>
-#include <PLReceiver.hpp>
-#include <Stubborn.hpp>
+#include "parser.hpp"
+#include "PLReceive.hpp"
+#include "PLBroadcast.hpp"
+#include "Stubborn.hpp"
+#include "FLSend.hpp"
 
 
 class FLReceive{
 
 public:
-	FLReceive(Stubborn *s, int sock_, unsigned long curId, std::vector<Parser::Host> hosts) : plr(s), sock(sock_){
+	FLReceive(FLSend *fls, Stubborn *s, PLBroadcast *plb, int sock_, unsigned long curId, std::vector<Parser::Host> hosts) : plr(fls, s, plb), sock(sock_){
 
 		unsigned short port;
 		std::string ip;
@@ -39,7 +41,7 @@ public:
         exit(1);
     }
 
-		std::thread receiverThread(&FLReceiverReceive::fp2pReceive, this);
+		std::thread receiverThread(&FLReceive::fp2pReceive, this);
 		receiverThread.detach();
 	}
 
@@ -49,7 +51,7 @@ public:
 	}
 
 private:
-	PLReceiver plr;
+	PLReceive plr;
 	int sock;
 	bool listen = true;
 
