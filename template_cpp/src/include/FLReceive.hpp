@@ -11,12 +11,13 @@
 #include "PLBroadcast.hpp"
 #include "Stubborn.hpp"
 #include "FLSend.hpp"
+#include "Logger.hpp"
 
 
 class FLReceive{
 
 public:
-	FLReceive(FLSend *fls, Stubborn *s, PLBroadcast *plb, int sock_, unsigned long curId, std::vector<Parser::Host> hosts) : plr(fls, s, plb, hosts.size(), curId), sock(sock_){
+	FLReceive(FLSend *fls, Stubborn *s, PLBroadcast *plb, int sock_, unsigned long curId, std::vector<Parser::Host> hosts, Logger *lg) : plr(fls, s, plb, hosts.size(), curId, lg), sock(sock_){
 
 		unsigned short port;
 		std::string ip;

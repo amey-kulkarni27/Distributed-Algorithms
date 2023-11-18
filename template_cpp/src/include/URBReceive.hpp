@@ -2,16 +2,18 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 #include "parser.hpp"
 #include "PLBroadcast.hpp"
 #include "FIFOReceive.hpp"
 #include "Helper.hpp"
+#include "Logger.hpp"
 
 class URBReceive{
 
 public:
-	URBReceive(PLBroadcast *plb_, unsigned long n, unsigned long selfId_): fifor(), plb(plb_), N(n), selfId(selfId_){
+	URBReceive(PLBroadcast *plb_, unsigned long n, unsigned long selfId_, Logger *lg): fifor(), plb(plb_), N(n), selfId(selfId_){
 	}
 
 	void deliver(string msg){
