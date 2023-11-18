@@ -8,13 +8,14 @@
 #include "PLBroadcast.hpp"
 #include "Stubborn.hpp"
 #include "FLSend.hpp"
+#include "URBReceive.hpp"
 #include "Helper.hpp"
 
 
 class PLReceive{
 	
 public:
-	PLReceive(FLSend *fls_, Stubborn *s_, PLBroadcast *plb_): urbr(plb_), fls(fls_), s(s_) {
+	PLReceive(FLSend *fls_, Stubborn *s_, PLBroadcast *plb_, unsigned long n, unsigned long curId): urbr(plb_, n, curId), fls(fls_), s(s_) {
 	}
 
 	void pp2pReceive(std::string recvMsg){
@@ -41,7 +42,7 @@ public:
 			unsigned long long plid = std::stoull(plidStr);
 			if(delivered.find(hid) == delivered.end() || delivered[hid].find(plid) == delivered[hid].end()){
 				delivered[hid].insert(plid);
-				(this->urbr).deliver(hid, msgWithoutSenderDetails);
+				(this->urbr).deliver(msgWithoutSenderDetails);
 			}
 		}
 	}
