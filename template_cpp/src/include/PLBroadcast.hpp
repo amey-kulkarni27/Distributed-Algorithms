@@ -16,7 +16,7 @@ class PLBroadcast{
 	
 public:
 
-	PLBroadcast(unsigned long id_, std::vector<Parser::Host> hosts) : s(hosts), id(id_){
+	PLBroadcast(unsigned long id, std::vector<Parser::Host> hosts) : s(hosts), {
 		for(auto host: hosts){
 			unsigned long h_id = host.id;
 			pl_ids[h_id] = 1;
@@ -56,7 +56,6 @@ public:
 
 private:
 	Stubborn s;
-	const unsigned long id;
 	map<unsigned long, unsigned long long> pl_ids;
 	std::vector<unsigned long> ids;
 	std::mutex broadcastLock; // Since both URBSend and URBReceive call this broadcast function
