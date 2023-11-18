@@ -42,12 +42,12 @@ public:
 		msg = std::to_string(ts) + "_" + msg;
 		ts++;
 
-		// append the sender id (here same as the self id) for the URB property
+		// append the sender id (here same as the self id) for the URB property (I am not really using it)
 		msg = std::to_string(id) + "_" + msg;
 
 
 		// Get the perfect links to broadcast the message
-		(this->plb).PLBroadcast(ts, msg);
+		(this->plb).PLBroadcast(msg);
 	}
 
 	void stopAll(){
