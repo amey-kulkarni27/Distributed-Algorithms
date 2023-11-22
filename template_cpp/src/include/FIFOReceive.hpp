@@ -31,13 +31,26 @@ private:
 	std::mutex orderLock;
 	bool sending = true;
 
+	void deliver(std::string msg, unsigned long id){
+
+		size_t curpos = 0;
+		size_t found = msg.find('_');
+		while(found != std::string::npos){
+			std::string underlying_msg = msg.substr(curpos, found - curpos);
+			(self->lg) -> log(underlying_msg, true, id);
+			curpos = found + 1;
+			found = msg.find('_', curpos);
+		}
+	}
+
 	int iterateOrder(){
 		const std::lock_guard<std::mutex> lock(orderLock);
 		if(order.size() == 0)
 			return 0;
 
-		for(auto const& [key, val]: order)
-			(self->lg) -> log(key, val.second, true)
+		for(auto const& [key, val]: order){
+			deliver(val.second, key);
+		}
 		return 1;
 	}
 
