@@ -19,15 +19,15 @@ public:
 	FUBroadcast(unsigned long id_, std::vector<Parser::Host> hosts) : plb(id_, hosts), id(id_){
 	}
 
-	FLSend getFLSend(){
+	FLSend& getFLSend(){
 		return (this->plb).getFLSend();
 	}
 
-	Stubborn getStubborn(){
+	Stubborn& getStubborn(){
 		return (this->plb).getStubborn();
 	}
 
-	PLBroadcast getPLBroadcast(){
+	PLBroadcast& getPLBroadcast(){
 		return (this->plb);
 
 	int getSocket(){

@@ -59,5 +59,6 @@ public:
 private:
 	std::unordered_map<unsigned long, Parser::Host> id_to_host;
 	std::mutex socketLock;
+	int sock;
 
 };

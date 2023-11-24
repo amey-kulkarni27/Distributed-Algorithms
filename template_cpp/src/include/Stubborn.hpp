@@ -13,6 +13,17 @@
 
 #include "FLSend.hpp"
 
+namespace std {
+	template <>
+	struct hash<std::pair<long unsigned int, long long unsigned int>> {
+		size_t operator()(const std::pair<long unsigned int, long long unsigned int>& p) const {
+
+			// The custom hash function separately hashes the first and second value of the pair
+			return hash<long unsigned int>()(p.first) ^ (hash<long long unsigned int>()(p.second) << 1);
+		}
+	};
+}
+
 class Stubborn{
 
 public:
@@ -25,7 +36,7 @@ public:
 		contSending.detach();
 	}
 
-	FLSend getFLSend(){
+	FLSend& getFLSend(){
 		return (this->fls);
 	}
 
@@ -36,7 +47,7 @@ public:
 	void sp2pSend(unsigned long h_id, unsigned long long ts, std::string msg){
 		const std::lock_guard<std::mutex> lock(mapLock);
 		tsToMsg[make_pair(h_id, ts)] = msg;
-	}
+}
 
 	void sp2pStop(unsigned long h_id, unsigned long long ts){
 		const std::lock_guard<std::mutex> lock(mapLock);
@@ -49,8 +60,8 @@ public:
 	}
 
 private:
-	std::unordered_map<pair<unsigned long, unsigned long long>, std::string> tsToMsg;
 	FLSend fls;
+	std::unordered_map<std::pair<unsigned long, unsigned long long>, std::string> tsToMsg;
 	std::mutex mapLock;
 	bool keep_sending = true;
 	unsigned short prt = 0;

@@ -26,12 +26,12 @@ public:
 		}
 	}
 
-	FLSend getFLSend(){
+	FLSend& getFLSend(){
 		return (this->s).getFLSend();
 	}
 
 	Stubborn getStubborn(){
-		return this->s;
+		return (this->s);
 	}
 
 	int getSocket(){

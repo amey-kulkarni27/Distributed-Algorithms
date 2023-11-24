@@ -9,7 +9,7 @@
 #include "parser.hpp"
 #include "Helper.hpp"
 
-class Logger(){
+class Logger{
 
 public:
 
@@ -29,13 +29,15 @@ public:
 		pthread_mutex_destroy(&logsLock);
 	}
 
-	void log(string msg, bool delivery, unsigned long senderId){
+	void log(std::string msg, bool delivery, unsigned long senderId){
+		std::string logMsg = "";
+		if(delivery)
+			logMsg = "d " + std::to_string(senderId) + " " + msg;
+		else
+			logMsg = "b " + msg;
 		sem_wait(&spotsLeft);
 		pthread_mutex_lock(&logsLock);
-		if(delivery)
-			logs.push("d " + std::to_string(senderId) + " " + msg);
-		else
-			logs.push("b " + msg);
+		logs.push(logMsg);
 		pthread_mutex_unlock(&logsLock);
 		sem_post(&spotsFilled);
 	}
@@ -51,6 +53,7 @@ private:
 	std::queue<std::string> logs;
 	pthread_mutex_t logsLock;
 	sem_t spotsLeft, spotsFilled;
+	std::string filePath;
 	std::ofstream outputFile;
 	bool flushing = true;
 

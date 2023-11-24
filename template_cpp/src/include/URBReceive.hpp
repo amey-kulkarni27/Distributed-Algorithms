@@ -13,7 +13,7 @@
 class URBReceive{
 
 public:
-	URBReceive(PLBroadcast *plb_, unsigned long n, unsigned long selfId_, Logger *lg): fifor(), plb(plb_), N(n), selfId(selfId_){
+	URBReceive(PLBroadcast &plb_, unsigned long n, unsigned long selfId_, Logger &lg): fifor(), plb(plb_), N(n), selfId(selfId_){
 	}
 
 	void deliver(string msg){
@@ -44,7 +44,7 @@ public:
 
 private:
 	FIFOReceive fifor;
-	PLBroadcast *plb;
+	PLBroadcast &plb;
 	const unsigned long N;
 	const unsigned long selfId;
 	unordered_map<pair<unsigned long, unsigned long>, unsigned long > acks;

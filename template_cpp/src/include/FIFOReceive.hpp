@@ -5,7 +5,7 @@
 #include <thread>
 #include <string>
 #include <unordered_map>
-#include <priority_queue>
+#include <queue>
 #include <mutex>
 
 #include "parser.hpp"
@@ -15,7 +15,7 @@
 class FIFOReceive(){
 
 public:
-	FIFOReceive(Logger *lg_): lg(lg_){
+	FIFOReceive(Logger &lg_): lg(lg_){
 		std::thread searching(&FIFOReceive::searchOrder, this);
 		searching.detach();
 	}
@@ -26,8 +26,8 @@ public:
 	}
 
 private:
-	Logger *lg;
-	unordered_map<unsigned long, priority_queue<pair<unsigned long, std::string>> > order;
+	Logger &lg;
+	unordered_map<unsigned long, std::priority_queue<pair<unsigned long, std::string>> > order;
 	std::mutex orderLock;
 	bool sending = true;
 
