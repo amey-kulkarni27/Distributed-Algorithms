@@ -12,7 +12,7 @@
 #include "Helper.hpp"
 #include "Logger.hpp"
 
-class FIFOReceive(){
+class FIFOReceive{
 
 public:
 	FIFOReceive(Logger &lg_): lg(lg_){
@@ -27,7 +27,7 @@ public:
 
 private:
 	Logger &lg;
-	unordered_map<unsigned long, std::priority_queue<pair<unsigned long, std::string>> > order;
+	std::unordered_map<unsigned long, std::priority_queue<std::pair<unsigned long, std::string> > > order;
 	std::mutex orderLock;
 	bool sending = true;
 

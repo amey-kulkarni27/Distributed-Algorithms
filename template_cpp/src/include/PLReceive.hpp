@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <unordered_map>
 
 #include "parser.hpp"
 #include "PLBroadcast.hpp"
@@ -52,6 +53,6 @@ private:
 	URBReceive urbr;
 	FLSend &fls;
 	Stubborn &s;
-	std::unordered_map<unsigned long, std::unordered_set<unsigned long long>> delivered;
+	std::unordered_map<unsigned long, std::set<unsigned long long>> delivered;
 
 };

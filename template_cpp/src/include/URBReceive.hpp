@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <functional>
+#include <utility>
 #include <string>
 #include <unordered_map>
 
@@ -10,13 +12,25 @@
 #include "Helper.hpp"
 #include "Logger.hpp"
 
+struct LongHash {
+    template <class T1, class T2>
+    std::size_t operator () (const std::pair<T1,T2> &p) const {
+        auto h1 = std::hash<T1>{}(p.first);
+        auto h2 = std::hash<T2>{}(p.second);
+
+        // Mainly for demonstration purposes, i.e. works but is overly simple
+        // In the real world, use sth. like boost.hash_combine
+        return h1 ^ h2;  
+    }
+};
+
 class URBReceive{
 
 public:
 	URBReceive(PLBroadcast &plb_, unsigned long n, unsigned long selfId_, Logger &lg): fifor(), plb(plb_), N(n), selfId(selfId_){
 	}
 
-	void deliver(string msg){
+	void deliver(std::string msg){
 
 		size_t firstUnderscore = msg.find('_');
 		std::string tsStr = msg.substr(0, firstUnderscore);
@@ -47,6 +61,6 @@ private:
 	PLBroadcast &plb;
 	const unsigned long N;
 	const unsigned long selfId;
-	unordered_map<pair<unsigned long, unsigned long>, unsigned long > acks;
+	std::unordered_map<std::pair<unsigned long, unsigned long>, unsigned long , LongHash> acks;
 
 };

@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <string>
-#include <set>
+#include <unordered_map>
 #include <cassert>
 #include <mutex>
 
@@ -16,7 +16,7 @@ class PLBroadcast{
 	
 public:
 
-	PLBroadcast(unsigned long id, std::vector<Parser::Host> hosts) : s(hosts), {
+	PLBroadcast(unsigned long id, std::vector<Parser::Host> hosts) : s(hosts) {
 		for(auto host: hosts){
 			unsigned long h_id = host.id;
 			pl_ids[h_id] = 1;
@@ -30,7 +30,7 @@ public:
 		return (this->s).getFLSend();
 	}
 
-	Stubborn getStubborn(){
+	Stubborn& getStubborn(){
 		return (this->s);
 	}
 
@@ -42,7 +42,7 @@ public:
 		// append pl_id to the start of the message so that the receiver knows
 		// get stubborn links to infinitely send that message
 		const std::lock_guard<std::mutex> lock(broadcastLock);
-		for(const &int h_id: ids){
+		for(const unsigned long& h_id: ids){
 			msg = std::to_string(pl_ids[h_id]) + "_" + msg;
 			(this->s).sp2pSend(h_id, pl_ids[h_id], msg);
 			pl_ids[h_id]++;
@@ -56,7 +56,7 @@ public:
 
 private:
 	Stubborn s;
-	map<unsigned long, unsigned long long> pl_ids;
+	std::unordered_map<unsigned long, unsigned long long> pl_ids;
 	std::vector<unsigned long> ids;
 	std::mutex broadcastLock; // Since both URBSend and URBReceive call this broadcast function
 
