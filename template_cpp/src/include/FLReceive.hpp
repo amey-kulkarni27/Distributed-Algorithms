@@ -25,7 +25,7 @@ public:
 		for(auto host: hosts){
 			if(host.id == curId){
 				port = host.portReadable();
-				ip = host.ipReadable().c_str();
+				ip = host.ipReadable();
 				break;
 			}
 		}
@@ -34,7 +34,7 @@ public:
 		memset(&serverAddress, 0, sizeof(serverAddress));
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(port);
-    serverAddress.sin_addr.s_addr = inet_addr(ip);
+    serverAddress.sin_addr.s_addr = inet_addr(ip.c_str());
 
 		if (bind(sock, reinterpret_cast<struct sockaddr *>(&serverAddress), sizeof(serverAddress)) < 0) {
         perror("Bind failed");

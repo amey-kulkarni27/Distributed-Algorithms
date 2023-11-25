@@ -27,7 +27,7 @@ struct LongHash {
 class URBReceive{
 
 public:
-	URBReceive(PLBroadcast &plb_, unsigned long n, unsigned long selfId_, Logger &lg): fifor(), plb(plb_), N(n), selfId(selfId_){
+	URBReceive(PLBroadcast &plb_, unsigned long n, unsigned long selfId_, Logger &lg): fifor(lg), plb(plb_), N(n), selfId(selfId_){
 	}
 
 	void deliver(std::string msg){
@@ -39,7 +39,7 @@ public:
 		std::string contents = msg.substr(secondUnderscore + 1); 
 		unsigned long ts = std::stoul(tsStr);
 		unsigned long originalId = std::stoul(idStr);
-		pair<unsigned long, unsigned long> uniqueMsgId = make_pair(originalId, ts);
+		std::pair<unsigned long, unsigned long> uniqueMsgId = std::make_pair(originalId, ts);
 
 		if(acks.find(uniqueMsgId) != acks.end() && acks[uniqueMsgId] > N / 2)
 			return;
@@ -47,13 +47,17 @@ public:
 		if(acks.find(uniqueMsgId) == acks.end()){
 			acks[uniqueMsgId] = 1; // itself
 			std::string msgToBroadcast = std::to_string(selfId) + "_" + msg;
-			(this->plb) -> broadcast(msgToBroadcast);
+			(this->plb).broadcast(msgToBroadcast);
 		}
 
 		acks[uniqueMsgId]++;
 		if(acks[uniqueMsgId] > N / 2)
 			(this->fifor).deliver(originalId, ts, contents);
 
+	}
+
+	void stopAll(){
+		(this->fifor).stopAll();
 	}
 
 private:

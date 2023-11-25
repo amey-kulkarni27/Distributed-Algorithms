@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
   std::cout << "Doing some initialization...\n\n";
 
 	unsigned long curId = parser.id();
-	Parser::Host curDetails = Helper::getReceiverInfo(hosts, curId);
+	Parser::Host curDetails = Helper::getInfo(hosts, curId);
 	Handler h(curId, parser.outputPath(), num_messages, hosts);
 	// std::this_thread::sleep_for(std::chrono::seconds(1));
 	std::cout << "Broadcasting and delivering messages...\n\n";

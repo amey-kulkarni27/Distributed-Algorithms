@@ -29,6 +29,7 @@ public:
 
 	PLBroadcast& getPLBroadcast(){
 		return (this->plb);
+	}
 
 	int getSocket(){
 		return (this->plb).getSocket();
@@ -47,7 +48,7 @@ public:
 
 
 		// Get the perfect links to broadcast the message
-		(this->plb).PLBroadcast(msg);
+		(this->plb).broadcast(msg);
 	}
 
 	void stopAll(){

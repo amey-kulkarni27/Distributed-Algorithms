@@ -25,9 +25,14 @@ public:
 		order[id].push(make_pair(ts, msg));
 	}
 
+	void stopAll(){
+		
+	}
+
 private:
 	Logger &lg;
 	std::unordered_map<unsigned long, std::priority_queue<std::pair<unsigned long, std::string> > > order;
+	std::unordered_map<unsigned long, unsigned long> expected;
 	std::mutex orderLock;
 	bool sending = true;
 
@@ -37,7 +42,7 @@ private:
 		size_t found = msg.find('_');
 		while(found != std::string::npos){
 			std::string underlying_msg = msg.substr(curpos, found - curpos);
-			(self->lg) -> log(underlying_msg, true, id);
+			(this->lg).log(underlying_msg, true, id);
 			curpos = found + 1;
 			found = msg.find('_', curpos);
 		}
@@ -49,7 +54,11 @@ private:
 			return 0;
 
 		for(auto const& [key, val]: order){
-			deliver(val.second, key);
+			if(expected[key] == val.top().first){
+				deliver(val.top().second, key);
+				order[key].pop();
+				expected[key]++;
+			}
 		}
 		return 1;
 	}

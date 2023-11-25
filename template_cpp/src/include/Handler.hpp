@@ -20,7 +20,7 @@ class Handler{
 public:
 
 	// Constructor named initialise, because we wanted to create a global object
-	Handler(unsigned long id, const char *outputPath, unsigned long num_messages_, std::vector<Parser::Host> hosts) : fub(id, hosts), lg(), flr((this->fub).getFLSend(), (this->fub).getStubborn(), (this->fub).getPLBroadcast(), (this->fub).getSocket(), curId, hosts, this->lg){
+	Handler(unsigned long id, const char *outputPath, unsigned long num_messages_, std::vector<Parser::Host> hosts) : fub(id, hosts), lg(outputPath), flr((this->fub).getFLSend(), (this->fub).getStubborn(), (this->fub).getPLBroadcast(), (this->fub).getSocket(), id, hosts, this->lg){
 		num_messages = num_messages_;
 	}
 

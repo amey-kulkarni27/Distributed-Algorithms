@@ -29,9 +29,10 @@ public:
 			std::string hidStr = recvMsg.substr(first_underscore + 1, second_underscore - first_underscore - 1);
 			std::string plidStr = recvMsg.substr(second_underscore + 1);
 			// get stubborn links to stop sending that message
-			(this -> s) -> sp2pStop(std::stoul(hidStr), std::stoull(plidStr));
+			(this -> s).sp2pStop(std::stoul(hidStr), std::stoull(plidStr));
 		}
 		else{
+			std::string msg = recvMsg;
 			size_t firstUnderscore = msg.find('_');
 			std::string plidStr = msg.substr(0, firstUnderscore);
 			size_t secondUnderscore = msg.find('_', firstUnderscore + 1);
@@ -39,7 +40,7 @@ public:
 			std::string msgWithoutSenderDetails = msg.substr(secondUnderscore + 1); // there will always be something to the right of the second underscore
 			std::string ackMsg = "A_" + hidStr + "_" + plidStr;
 			unsigned long hid = std::stoul(hidStr);
-			(this -> fls) -> fp2pSend(hid, ackMsg);
+			(this -> fls).fp2pSend(hid, ackMsg);
 			unsigned long long plid = std::stoull(plidStr);
 			if(delivered.find(hid) == delivered.end() || delivered[hid].find(plid) == delivered[hid].end()){
 				delivered[hid].insert(plid);
@@ -48,6 +49,9 @@ public:
 		}
 	}
 
+	void stopAll(){
+		(this->urbr).stopAll();
+	}
 
 private:
 	URBReceive urbr;
