@@ -45,9 +45,10 @@ public:
 			return;
 
 		if(acks.find(uniqueMsgId) == acks.end()){
-			acks[uniqueMsgId] = 1; // itself
+			acks[uniqueMsgId] = 1; // itself. ACK that it itself has received it
 			std::string msgToBroadcast = std::to_string(selfId) + "_" + msg;
-			(this->plb).broadcast(msgToBroadcast);
+			if(selfId != originalId) // in case they are equal, we have already broadcasted this message
+				(this->plb).broadcast(msgToBroadcast);
 		}
 
 		acks[uniqueMsgId]++;
