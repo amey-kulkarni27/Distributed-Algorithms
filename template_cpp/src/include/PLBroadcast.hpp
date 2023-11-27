@@ -43,8 +43,8 @@ public:
 		// get stubborn links to infinitely send that message
 		const std::lock_guard<std::mutex> lock(broadcastLock);
 		for(const unsigned long& h_id: ids){
-			msg = std::to_string(pl_ids[h_id]) + "_" + msg;
-			(this->s).sp2pSend(h_id, pl_ids[h_id], msg);
+			std::string stubMsg = std::to_string(pl_ids[h_id]) + "_" + msg;
+			(this->s).sp2pSend(h_id, pl_ids[h_id], stubMsg);
 			pl_ids[h_id]++;
 		}
 	}
