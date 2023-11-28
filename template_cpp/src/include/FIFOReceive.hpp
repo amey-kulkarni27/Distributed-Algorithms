@@ -15,7 +15,9 @@
 class FIFOReceive{
 
 public:
-	FIFOReceive(Logger &lg_): lg(lg_){
+	FIFOReceive(Logger &lg_, unsigned long n): lg(lg_){
+		for(unsigned long i = 1; i <= n; i++)
+			expected[i] = 1;
 		std::thread searching(&FIFOReceive::searchOrder, this);
 		searching.detach();
 	}
@@ -30,8 +32,15 @@ public:
 	}
 
 private:
+
+	struct MinHeapComp{
+		bool operator()(const std::pair<unsigned long, std::string>& a, const std::pair<unsigned long, std::string>& b) const {
+			return a.first > b.first;
+		}
+	};
+
 	Logger &lg;
-	std::unordered_map<unsigned long, std::priority_queue<std::pair<unsigned long, std::string> > > order;
+	std::unordered_map<unsigned long, std::priority_queue<std::pair<unsigned long, std::string>, std::vector<std::pair<unsigned long, std::string>>, MinHeapComp> > order;
 	std::unordered_map<unsigned long, unsigned long> expected;
 	std::mutex orderLock;
 	bool sending = true;
