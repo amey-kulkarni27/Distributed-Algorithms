@@ -62,8 +62,6 @@ public:
 		sem_wait(&spotsLeft);
 		pthread_mutex_lock(&broadcastLock);
 		// Get the perfect links to broadcast the message
-		std::cout<<"Printing"<<std::endl;
-		std::cout<<msg<<std::endl;
 		(this->plb).broadcast(msg);
 		msgsInNetwork++;
 		pthread_mutex_unlock(&broadcastLock);
