@@ -9,13 +9,14 @@
 #include <mutex>
 
 #include "parser.hpp"
+#include "FUBroadcast.hpp"
 #include "Helper.hpp"
 #include "Logger.hpp"
 
 class FIFOReceive{
 
 public:
-	FIFOReceive(Logger &lg_, unsigned long n): lg(lg_){
+	FIFOReceive(FUBroadcast &fub_, Logger &lg_, unsigned long n): fub(fub_), lg(lg_){
 		for(unsigned long i = 1; i <= n; i++)
 			expected[i] = 1;
 		std::thread searching(&FIFOReceive::searchOrder, this);
@@ -39,6 +40,7 @@ private:
 		}
 	};
 
+	FUBroadcast &fub;
 	Logger &lg;
 	std::unordered_map<unsigned long, std::priority_queue<std::pair<unsigned long, std::string>, std::vector<std::pair<unsigned long, std::string>>, MinHeapComp> > order;
 	std::unordered_map<unsigned long, unsigned long> expected;
@@ -46,6 +48,8 @@ private:
 	bool sending = true;
 
 	void deliver(std::string msg, unsigned long id){
+
+		(this->fub).msgDelivered();
 
 		size_t curpos = 0;
 		size_t found = msg.find('_');

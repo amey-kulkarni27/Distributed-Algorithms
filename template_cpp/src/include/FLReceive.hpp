@@ -17,7 +17,7 @@
 class FLReceive{
 
 public:
-	FLReceive(FLSend &fls, Stubborn &s, PLBroadcast &plb, int sock_, unsigned long curId, std::vector<Parser::Host> hosts, Logger &lg) : plr(fls, s, plb, hosts.size(), curId, lg), sock(sock_){
+	FLReceive(FLSend &fls, Stubborn &s, PLBroadcast &plb, FUBroadcast &fub, int sock_, unsigned long curId, std::vector<Parser::Host> hosts, Logger &lg) : plr(fls, s, plb, fub, hosts.size(), curId, lg), sock(sock_){
 
 		unsigned short port;
 		std::string ip;

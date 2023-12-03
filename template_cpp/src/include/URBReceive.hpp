@@ -27,7 +27,7 @@ struct LongHash {
 class URBReceive{
 
 public:
-	URBReceive(PLBroadcast &plb_, unsigned long n, unsigned long selfId_, Logger &lg): fifor(lg, n), plb(plb_), N(n), selfId(selfId_){
+	URBReceive(PLBroadcast &plb_, FUBroadcast &fub, unsigned long n, unsigned long selfId_, Logger &lg): fifor(fub, lg, n), plb(plb_), N(n), selfId(selfId_){
 	}
 
 	void deliver(std::string msg){
