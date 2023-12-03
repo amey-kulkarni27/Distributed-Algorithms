@@ -16,7 +16,7 @@
 class FIFOReceive{
 
 public:
-	FIFOReceive(FUBroadcast &fub_, Logger &lg_, unsigned long n): fub(fub_), lg(lg_){
+	FIFOReceive(FUBroadcast &fub_, Logger &lg_, unsigned long selfId_, unsigned long n): fub(fub_), lg(lg_), selfId(selfId_){
 		for(unsigned long i = 1; i <= n; i++)
 			expected[i] = 1;
 		std::thread searching(&FIFOReceive::searchOrder, this);
@@ -42,6 +42,7 @@ private:
 
 	FUBroadcast &fub;
 	Logger &lg;
+	unsigned long selfId;
 	std::unordered_map<unsigned long, std::priority_queue<std::pair<unsigned long, std::string>, std::vector<std::pair<unsigned long, std::string>>, MinHeapComp> > order;
 	std::unordered_map<unsigned long, unsigned long> expected;
 	std::mutex orderLock;
@@ -49,7 +50,8 @@ private:
 
 	void deliver(std::string msg, unsigned long id){
 
-		(this->fub).msgDelivered();
+		if(id == selfId)
+			(this->fub).msgDelivered();
 
 		size_t curpos = 0;
 		size_t found = msg.find('_');
