@@ -89,6 +89,6 @@ private:
 	int msgsInNetwork = 0;
 	pthread_mutex_t broadcastLock;
 	sem_t spotsLeft, spotsFilled;
-	const int MAX_MSGS = 100;
+	const int MAX_MSGS = 200;
 
 };
