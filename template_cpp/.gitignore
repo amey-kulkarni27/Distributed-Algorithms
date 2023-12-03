@@ -5,7 +5,6 @@
 
 bin/da_proc
 target/
-../example/output/*
 
 ### C ###
 # Prerequisites
