@@ -29,7 +29,7 @@ public:
 	}
 
 	void stopAll(){
-		
+		sending = false;
 	}
 
 private:
