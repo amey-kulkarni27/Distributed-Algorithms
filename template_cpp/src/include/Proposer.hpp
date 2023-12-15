@@ -15,8 +15,8 @@ class Proposer{
 
 public:
     Proposer(const char *configPath, const char *outputPath, std::vector<Parser::Host> hosts, unsigned long curId) : plb(curId, hosts), lg(outputPath, hosts.size()), selfId(curId){
-        if(Helper::readParams(configPath, num_proposals, proposals) == false)
-		    std::cerr<<"Failed to read parameters from the config file "<<std::endl;
+        if(Helper::readParams(configPath, num_proposals, vs, ds, proposals) == false)
+					std::cerr<<"Failed to read parameters from the config file "<<std::endl;
         active.resize(num_proposals, true);
         active_proposal_ts.resize(num_proposals, 0); // every proposal has a time-stamp
         ack_count.resize(num_proposals, 1); // 1 for itself
@@ -48,8 +48,9 @@ public:
         std::vector<unsigned long> inds;
         while(num_active > 0){
             for(unsigned long i = 0; i < num_proposals; i++){
-                if(check(inds, i))
-                    packAndBroadcast(inds);
+                if(check(inds, i)){
+                  packAndBroadcast(inds);
+								}
             }
         }
     }
@@ -98,6 +99,8 @@ private:
     Logger lg;
     unsigned long selfId;
     unsigned long num_proposals;
+    unsigned long vs;
+    unsigned long ds;
     std::vector<std::unordered_set<unsigned long>> proposals;
     std::vector<bool> active;
     std::vector<unsigned long> active_proposal_ts;

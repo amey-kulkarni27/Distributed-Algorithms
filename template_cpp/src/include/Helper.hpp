@@ -45,18 +45,15 @@ public:
 		return dummy;
 	}
 
- 	static bool readParams (const char *configPath, unsigned long &num_proposals, std::vector<std::unordered_set<unsigned long>> proposals){
+ 	static bool readParams (const char *configPath, unsigned long &num_proposals, unsigned long &vs, unsigned long &ds, std::vector<std::unordered_set<unsigned long>> &proposals){
 		std::ifstream configFile(configPath);
-
 		if(configFile.is_open()){
 			std::string firstLine;
 			if(getline(configFile, firstLine)){
 				std::istringstream iss(firstLine);
-				if(iss>>num_proposals){
-					return true;
-				}
+				if(iss>>num_proposals>>vs>>ds);
 				else
-					std::cerr<<"Failed to read in the two integers "<<std::endl;
+					std::cerr<<"Failed to read in the three integers "<<std::endl;
 			}
 			else
 				std::cerr<<"Failed to read the first line "<<std::endl;
