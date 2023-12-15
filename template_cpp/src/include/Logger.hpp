@@ -33,7 +33,7 @@ public:
 private:
 	std::vector<std::unordered_set<unsigned long>> logs;
 	std::vector<bool> has;
-	int ptr;
+	unsigned long ptr;
 	std::string filePath;
 	std::ofstream outputFile;
 	unsigned long n;
