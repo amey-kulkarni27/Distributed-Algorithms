@@ -1,14 +1,8 @@
 #pragma once 
  
-#include <iostream> 
-#include <string>
-#include <map>
-#include <queue>
-#include <memory>
+#include <iostream>
 
-#include "parser.hpp" 
 #include "Helper.hpp"
-#include "Logger.hpp"
 
 // Sender side
 #include "Proposer.hpp" 
@@ -27,16 +21,11 @@ public:
 	}
 
 	void stopExchange(){
-		// stop broadcasting
 		(this->p).stopAll();
 	}
 
 private:
 	Proposer p;
 	FLReceive flr;
-	
-
-
-
 
 };

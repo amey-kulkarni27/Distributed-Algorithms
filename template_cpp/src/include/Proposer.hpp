@@ -14,7 +14,7 @@
 class Proposer{
 
 public:
-    Proposer(const char *configPath, const char *outputPath, std::vector<Parser::Host> hosts, unsigned long curId) : plb(curId, hosts), selfId(curId){
+    Proposer(const char *configPath, const char *outputPath, std::vector<Parser::Host> hosts, unsigned long curId) : plb(curId, hosts), lg(outputPath, hosts.size()), selfId(curId){
         if(Helper::readParams(configPath, num_proposals, proposals) == false)
 		    std::cerr<<"Failed to read parameters from the config file "<<std::endl;
         active.resize(num_proposals, true);
@@ -86,6 +86,7 @@ public:
 
 private:
     PLBroadcast plb;
+    Logger lg;
     unsigned long selfId;
     unsigned long num_proposals;
     std::vector<std::unordered_set<unsigned long>> proposals;
@@ -113,15 +114,23 @@ private:
 
     bool check(std::vector<unsigned long> &inds, unsigned long i){
         const std::lock_guard<std::mutex> lock(proposalLock);
-        if(!num_active)
+        if(!active[i])
             return false;
         if(active_proposal_ts[i] == 0 or (ack_count[i] + nack_count[i] > n / 2)){
-            inds.push_back(i);
-            ack_count[i] = 0;
-            nack_count[i] = 0;
-            active_proposal_ts[i]++;
-            if(inds.size() >= std::min(8ul, num_active))
-                return true;
+            if(ack_count[i] > n / 2){
+                (this->lg).logAndFlush(i, proposals[i]);
+
+                active[i] = false;
+            }
+            else{
+                inds.push_back(i);
+                ack_count[i] = 0;
+                nack_count[i] = 0;
+                active_proposal_ts[i]++;
+                if(inds.size() >= std::min(8ul, num_active))
+                    return true;
+            }
+            
         }
         return false;
     }
