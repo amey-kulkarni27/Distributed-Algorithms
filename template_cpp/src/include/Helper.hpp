@@ -45,7 +45,7 @@ public:
 		return dummy;
 	}
 
- 	static bool readParams (const char *configPath, unsigned long &num_proposals, unsigned long &vs, unsigned long &ds, std::vector<std::unordered_set<unsigned long>> &proposals){
+ 	static void readParams (const char *configPath, unsigned long &num_proposals, unsigned long &vs, unsigned long &ds, std::vector<std::unordered_set<unsigned long>> &proposals){
 		std::ifstream configFile(configPath);
 		if(configFile.is_open()){
 			std::string firstLine;
@@ -75,8 +75,6 @@ public:
 		}
 		else
 			std::cerr<<"Failed to open config file "<<std::endl;
-
-		return false;
 	}
 
 };

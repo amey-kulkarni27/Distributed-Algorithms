@@ -15,8 +15,7 @@ class Proposer{
 
 public:
     Proposer(const char *configPath, const char *outputPath, std::vector<Parser::Host> hosts, unsigned long curId) : plb(curId, hosts), lg(outputPath, hosts.size()), selfId(curId){
-        if(Helper::readParams(configPath, num_proposals, vs, ds, proposals) == false)
-					std::cerr<<"Failed to read parameters from the config file "<<std::endl;
+        Helper::readParams(configPath, num_proposals, vs, ds, proposals);
         active.resize(num_proposals, true);
         active_proposal_ts.resize(num_proposals, 0); // every proposal has a time-stamp
         ack_count.resize(num_proposals, 1); // 1 for itself
