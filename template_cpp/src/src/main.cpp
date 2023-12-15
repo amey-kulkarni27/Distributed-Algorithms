@@ -69,20 +69,15 @@ int main(int argc, char **argv) {
   std::cout << "===============\n";
   std::cout << parser.configPath() << "\n\n";
 
-	// Finding out the parameters
-	unsigned long num_messages;
 
 	// Remove log file if already exists
 	Helper::removeFile(parser.outputPath());
-
-	if(Helper::readParams(parser.configPath(), num_messages) == false)
-		std::cerr<<"Failed to read parameters from the config file "<<std::endl;
 
   std::cout << "Doing some initialization...\n\n";
 
 	unsigned long curId = parser.id();
 	Parser::Host curDetails = Helper::getInfo(hosts, curId);
-	Handler h(curId, parser.outputPath(), num_messages, hosts);
+	Handler h(parser.configPath(), parser.outputPath(), hosts, curId);
 	// std::this_thread::sleep_for(std::chrono::seconds(1));
 	std::cout << "Broadcasting and delivering messages...\n\n";
 	hptr = &h;

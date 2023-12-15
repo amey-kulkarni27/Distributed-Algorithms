@@ -17,7 +17,7 @@
 class FLReceive{
 
 public:
-	FLReceive(FLSend &fls, Stubborn &s, PLBroadcast &plb, FUBroadcast &fub, int sock_, unsigned long curId, std::vector<Parser::Host> hosts, Logger &lg) : plr(fls, s, plb, fub, hosts.size(), curId, lg), sock(sock_){
+	FLReceive(FLSend &fls, Stubborn &s, PLBroadcast &plb, Proposer &p, int sock_, unsigned long curId, std::vector<Parser::Host> hosts) : plr(fls, s, plb, p, hosts.size(), curId), sock(sock_){
 
 		unsigned short port;
 		std::string ip;
@@ -32,24 +32,20 @@ public:
 
 		sockaddr_in serverAddress;
 		memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(port);
-    serverAddress.sin_addr.s_addr = inet_addr(ip.c_str());
+		serverAddress.sin_family = AF_INET;
+		serverAddress.sin_port = htons(port);
+		serverAddress.sin_addr.s_addr = inet_addr(ip.c_str());
 
 		if (bind(sock, reinterpret_cast<struct sockaddr *>(&serverAddress), sizeof(serverAddress)) < 0) {
-        perror("Bind failed");
-        close(sock);
-        exit(1);
-    }
+			perror("Bind failed");
+			close(sock);
+			exit(1);
+		}
 
 		std::thread receiverThread(&FLReceive::fp2pReceive, this);
 		receiverThread.detach();
 	}
 
-	void stopAll(){
-		(this->plr).stopAll();
-		listen = false;
-	}
 
 private:
 	PLReceive plr;

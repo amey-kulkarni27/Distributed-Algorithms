@@ -6,22 +6,22 @@
 #include <unordered_map>
 
 #include "parser.hpp"
-#include "PLBroadcast.hpp"
+#include "Proposer.hpp"
 #include "Stubborn.hpp"
 #include "FLSend.hpp"
-#include "URBReceive.hpp"
+#include "Acceptor.hpp"
 #include "Helper.hpp"
 
 
 class PLReceive{
 	
 public:
-	PLReceive(FLSend &fls_, Stubborn &s_, PLBroadcast &plb, FUBroadcast &fub, unsigned long n, unsigned long curId, Logger &lg): urbr(plb, fub, n, curId, lg), fls(fls_), s(s_) {
+	PLReceive(FLSend &fls_, Stubborn &s_, PLBroadcast &plb, Proposer &prop_, unsigned long n, unsigned long curId): acc(plb, curId), fls(fls_), s(s_), prop(prop_), selfId(curId) {
 	}
 
 	void pp2pReceive(std::string recvMsg){
 
-		// Two types of recvMsg 1) ACK_hid_plid, 2) Actual message
+		// Two types of recvMsg 1) A_hid_plid, 2) Actual message = plid_hid_P/R
 
 		if(recvMsg[0] == 'A'){
 			size_t first_underscore = recvMsg.find('_');
@@ -44,19 +44,21 @@ public:
 			unsigned long long plid = std::stoull(plidStr);
 			if(delivered.find(hid) == delivered.end() || delivered[hid].find(plid) == delivered[hid].end()){
 				delivered[hid].insert(plid);
-				(this->urbr).deliver(msgWithoutSenderDetails);
+				size_t underscore = msgWithoutSenderDetails.find('_');
+				if(msgWithoutSenderDetails[0] == 'P')
+					(this->acc).process(msgWithoutSenderDetails.substr(underscore + 1), hid);
+				else
+					(this->prop).response(msgWithoutSenderDetails.substr(underscore + 1));
 			}
 		}
 	}
 
-	void stopAll(){
-		(this->urbr).stopAll();
-	}
-
 private:
-	URBReceive urbr;
+	Acceptor acc;
 	FLSend &fls;
 	Stubborn &s;
+	Proposer &prop;
+	unsigned long selfId;
 	std::unordered_map<unsigned long, std::set<unsigned long long>> delivered;
 
 };

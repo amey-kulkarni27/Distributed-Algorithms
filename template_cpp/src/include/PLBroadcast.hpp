@@ -49,6 +49,14 @@ public:
 		}
 	}
 
+	void send(std::string responseMsg, unsigned long h_id){
+		// response ACK/NACK to the sender
+		const std::lock_guard<std::mutex> lock(broadcastLock);
+		std::string stubMsg = std::to_string(pl_ids[h_id]) + "_" + std::to_string(h_id) + "_" + responseMsg;
+		(this->s).sp2pSend(h_id, pl_ids[h_id], stubMsg);
+		pl_ids[h_id]++;
+	}
+
 	void stopAll(){
 		(this->s).stopAll();
 	}
@@ -58,6 +66,6 @@ private:
 	Stubborn s;
 	std::unordered_map<unsigned long, unsigned long long> pl_ids;
 	std::vector<unsigned long> ids;
-	std::mutex broadcastLock; // Since both URBSend and URBReceive call this broadcast function
+	std::mutex broadcastLock; // Since both Proposer and Acceptor call this broadcast function
 
 };

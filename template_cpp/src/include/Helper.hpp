@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <unordered_set>
 #include <queue>
 #include <map>
 #include <cassert>
@@ -43,14 +45,14 @@ public:
 		return dummy;
 	}
 
- 	static bool readParams (const char *configPath, unsigned long &num_messages){
+ 	static bool readParams (const char *configPath, unsigned long &num_proposals, std::vector<std::unordered_set<unsigned long>> proposals){
 		std::ifstream configFile(configPath);
 
 		if(configFile.is_open()){
 			std::string firstLine;
 			if(getline(configFile, firstLine)){
 				std::istringstream iss(firstLine);
-				if(iss>>num_messages){
+				if(iss>>num_proposals){
 					return true;
 				}
 				else
@@ -58,7 +60,21 @@ public:
 			}
 			else
 				std::cerr<<"Failed to read the first line "<<std::endl;
-
+			
+			// Read proposals one by one
+			for(unsigned long i = 0; i < num_proposals; i++){
+				std::string proposalLine;
+				if(getline(configFile, proposalLine)){
+					std::istringstream proposalIss(proposalLine);
+					std::unordered_set<unsigned long> proposal;
+					unsigned long num;
+					while(proposalIss >> num)
+						proposal.insert(num);
+					proposals.push_back(proposal);
+				}
+				else
+					std::cerr<<"Failed to read the proposal line "<<std::endl;
+			}
 		}
 		else
 			std::cerr<<"Failed to open config file "<<std::endl;
