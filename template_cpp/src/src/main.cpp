@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
 	// std::this_thread::sleep_for(std::chrono::seconds(1));
 	std::cout << "Broadcasting and delivering messages...\n\n";
 	hptr = &h;
-	h.startExchange();
+	h.startPropose();
 
   // After a process finishes broadcasting,
   // it waits forever for the delivery of messages.

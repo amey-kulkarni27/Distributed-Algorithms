@@ -24,9 +24,6 @@ public:
         num_active = num_proposals;
         n = hosts.size();
 
-        // Create proposing thread
-        std::thread proposingThread(&Proposer::propose, this);
-        proposingThread.detach();
     }
 
     FLSend& getFLSend(){
@@ -44,6 +41,18 @@ public:
 	int getSocket(){
 		return (this->plb).getSocket();
 	}
+
+    void propose(){
+        // if the ts is 0, send it, otherwise check if ack_count + nack_count > n/2
+        // if it is, reset the counts
+        std::vector<unsigned long> inds;
+        while(num_active > 0){
+            for(unsigned long i = 0; i < num_proposals; i++){
+                if(check(inds, i))
+                    packAndBroadcast(inds);
+            }
+        }
+    }
 
     void response(std::string responseMsg){
 
@@ -135,17 +144,7 @@ private:
         return false;
     }
 
-    void propose(){
-        // if the ts is 0, send it, otherwise check if ack_count + nack_count > n/2
-        // if it is, reset the counts
-        std::vector<unsigned long> inds;
-        while(num_active > 0){
-            for(unsigned long i = 0; i < num_proposals; i++){
-                if(check(inds, i))
-                    packAndBroadcast(inds);
-            }
-        }
-    }
+
 
     void update(std::string &ret, unsigned long &i, unsigned long &ts, std::unordered_set<unsigned long> toAdd){
         if(ts < active_proposal_ts[i])
