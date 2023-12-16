@@ -18,6 +18,7 @@ public:
 	}
 
 	void process(std::string msg, unsigned long from){
+		std::cout<<"Received "<<msg<<" from "<<from<<std::endl;
 		std::vector<std::string> returnChar; // ACK or NACK ('Y' or 'N')
 		std::vector<unsigned long> inds, timestamps; // what positions and timestamps
 		std::vector<std::set<unsigned long>> toAdd; // the elements that should be added
@@ -72,6 +73,8 @@ public:
 					returnMsg += std::to_string(x) + "_";
 			returnMsg += "|_";
 		}
+		returnMsg = std::to_string(selfId) + "_" + returnMsg;
+		std::cout<<"Sending "<<returnMsg<<" to "<<from<<std::endl;
 		(this->plb).send(returnMsg, from);
 	}
 

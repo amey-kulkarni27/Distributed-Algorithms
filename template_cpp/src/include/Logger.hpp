@@ -21,10 +21,11 @@ public:
 
 
 	void logAndFlush(unsigned long pos, std::unordered_set<unsigned long> nums){
+		std::cout<<"Log"<<std::endl;
 		logs[pos] = nums;
 		has[pos] = true;
 		while(ptr < num_proposals and has[ptr]){
-			writeNewLine(nums);
+			writeNewLine(logs[ptr]);
 			logs[ptr].clear();
 			ptr++;
 		}

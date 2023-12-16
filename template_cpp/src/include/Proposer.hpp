@@ -18,9 +18,10 @@ public:
         Helper::readParams(configPath, num_proposals, vs, ds, proposals);
         active.resize(num_proposals, true);
         active_proposal_ts.resize(num_proposals, 0); // every proposal has a time-stamp
-        ack_count.resize(num_proposals, 1); // 1 for itself
+        ack_count.resize(num_proposals, 0); // 1 for itself
         nack_count.resize(num_proposals, 0);
         num_active = num_proposals;
+        to_be_broadcast = num_proposals;
         n = hosts.size();
 
     }
@@ -52,7 +53,7 @@ public:
         while(num_active > 0){
             for(unsigned long i = 0; i < num_proposals; i++){
                 if(check(inds, i)){
-				  packAndBroadcast(inds);
+					packAndBroadcast(inds);
 				}
             }
         }
@@ -60,6 +61,7 @@ public:
 
     void response(std::string responseMsg){
 
+		std::cout<<"Received "<<responseMsg<<std::endl;
         size_t curPos = 0;
 		size_t nxtPos = responseMsg.find('_', curPos);
         bool cObt = false, iObt = false, tsObt = false;
@@ -110,43 +112,51 @@ private:
     std::vector<unsigned long> ack_count;
     std::vector<unsigned long> nack_count;
     unsigned long num_active;
+    unsigned long to_be_broadcast;
     std::string msg;
     unsigned long n;
     std::mutex proposalLock;
 
     void packAndBroadcast(std::vector<unsigned long> &inds){
+		const std::lock_guard<std::mutex> lock(proposalLock);
         std::string payload = std::to_string(selfId) + "_P_"; // indicating proposal and by who (for resending purposes)
         for(const unsigned long ind: inds){
             unsigned long ts = active_proposal_ts[ind];
             payload += std::to_string(ind) + "_" + std::to_string(ts) + "_";
             for(const unsigned long &num: proposals[ind]){
+				// std::cout<<num<<' '<<ind<<std::endl;
                 payload += std::to_string(num) + "_";
             }
             payload += "|_";
         }
 		inds.clear();
+		std::cout<<"Sending "<<payload<<" to all"<<std::endl;
         (this -> plb).broadcast(payload);
     }
 
     bool check(std::vector<unsigned long> &inds, unsigned long i){
+		std::this_thread::sleep_for(std::chrono::milliseconds(700));
         const std::lock_guard<std::mutex> lock(proposalLock);
-		if(inds.size() >= std::min(8ul, num_active))
-			return true;
         if(!active[i])
             return false;
+		if(ack_count[i] > n / 2){
+			num_active--;
+			active[i] = false;
+			(this->lg).logAndFlush(i, proposals[i]);
+			return false;
+		}
+		// std::cout<<to_be_broadcast<<std::endl;
+		if(inds.size() >= std::min(8ul, to_be_broadcast) and to_be_broadcast > 0){
+			to_be_broadcast -= inds.size();
+			return true;
+		}
         if(active_proposal_ts[i] == 0 or (ack_count[i] + nack_count[i] > n / 2)){
-            if(ack_count[i] > n / 2){
-                (this->lg).logAndFlush(i, proposals[i]);
-				num_active--;
-                active[i] = false;
-				std::cout<<num_active<<' '<<inds.size()<<std::endl;
-            }
-            else{
-                inds.push_back(i);
-                ack_count[i] = 1;
-                nack_count[i] = 0;
-                active_proposal_ts[i]++;
-            }
+			inds.push_back(i);
+			ack_count[i] = 0;
+			nack_count[i] = 0;
+			if(active_proposal_ts[i] != 0)
+				to_be_broadcast++;
+			active_proposal_ts[i]++;
         }
         return false;
     }
@@ -158,6 +168,7 @@ private:
         if(ts < active_proposal_ts[i])
             return;
         assert(ts == active_proposal_ts[i]);
+		std::cout<<ret<<std::endl;
         if(ret == "Y")
             ack_count[i]++;
         else{

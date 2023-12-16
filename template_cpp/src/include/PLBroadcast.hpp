@@ -20,7 +20,7 @@ public:
 		for(auto host: hosts){
 			unsigned long h_id = host.id;
 			pl_ids[h_id] = 1;
-			if(h_id != id)
+			// if(h_id != id)
 				ids.push_back(h_id);
 			// ids contains all the host ids except its own
 		}
@@ -52,7 +52,9 @@ public:
 	void send(std::string responseMsg, unsigned long h_id){
 		// response ACK/NACK to the sender
 		const std::lock_guard<std::mutex> lock(broadcastLock);
-		std::string stubMsg = std::to_string(pl_ids[h_id]) + "_" + std::to_string(h_id) + "_" + responseMsg;
+		std::string stubMsg = std::to_string(pl_ids[h_id]) + "_" + responseMsg;
+		if(responseMsg == "R_Y_0_1_|_")
+			std::cout<<"HERE "<<stubMsg<<std::endl;
 		(this->s).sp2pSend(h_id, pl_ids[h_id], stubMsg);
 		pl_ids[h_id]++;
 	}

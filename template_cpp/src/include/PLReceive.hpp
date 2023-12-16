@@ -33,6 +33,8 @@ public:
 		}
 		else{
 			std::string msg = recvMsg;
+			if(recvMsg == "1_1_R_Y_0_1_|_")
+				std::cout<<"HEY"<<std::endl;
 			size_t firstUnderscore = msg.find('_');
 			std::string plidStr = msg.substr(0, firstUnderscore);
 			size_t secondUnderscore = msg.find('_', firstUnderscore + 1);
@@ -43,6 +45,7 @@ public:
 			(this -> fls).fp2pSend(hid, ackMsg);
 			unsigned long long plid = std::stoull(plidStr);
 			if(delivered.find(hid) == delivered.end() || delivered[hid].find(plid) == delivered[hid].end()){
+				// std::cout<<recvMsg<<std::endl;
 				delivered[hid].insert(plid);
 				size_t underscore = msgWithoutSenderDetails.find('_');
 				if(msgWithoutSenderDetails[0] == 'P')
@@ -52,6 +55,7 @@ public:
 			}
 		}
 	}
+
 
 private:
 	Acceptor acc;
