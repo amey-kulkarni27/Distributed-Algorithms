@@ -10,6 +10,8 @@
 #include "PLBroadcast.hpp"
 #include "Helper.hpp"
 
+#include <ctime>
+
 class Acceptor{
 
 public:
@@ -18,6 +20,8 @@ public:
 	}
 
 	void process(std::string msg, unsigned long from){
+		std::time_t t = std::time(nullptr);
+		std::cout << "Current Time: " << std::asctime(std::localtime(&t));
 		std::cout<<"Received "<<msg<<" from "<<from<<std::endl;
 		std::vector<std::string> returnChar; // ACK or NACK ('Y' or 'N')
 		std::vector<unsigned long> inds, timestamps; // what positions and timestamps
@@ -74,6 +78,8 @@ public:
 			returnMsg += "|_";
 		}
 		returnMsg = std::to_string(selfId) + "_" + returnMsg;
+		t = std::time(nullptr);
+		std::cout << "Current Time: " << std::asctime(std::localtime(&t));
 		std::cout<<"Sending "<<returnMsg<<" to "<<from<<std::endl;
 		(this->plb).send(returnMsg, from);
 	}

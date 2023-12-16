@@ -60,7 +60,8 @@ public:
     }
 
     void response(std::string responseMsg){
-
+        std::time_t t = std::time(nullptr);
+		std::cout << "Current Time: " << std::asctime(std::localtime(&t));
 		std::cout<<"Received "<<responseMsg<<std::endl;
         size_t curPos = 0;
 		size_t nxtPos = responseMsg.find('_', curPos);
@@ -129,6 +130,8 @@ private:
             payload += "|_";
         }
 		inds.clear();
+        std::time_t t = std::time(nullptr);
+		std::cout << "Current Time: " << std::asctime(std::localtime(&t));
 		std::cout<<"Sending "<<payload<<" to all"<<std::endl;
         (this -> plb).broadcast(payload);
     }
