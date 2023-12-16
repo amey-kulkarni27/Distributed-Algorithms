@@ -145,12 +145,15 @@ private:
 			(this->lg).logAndFlush(i, proposals[i]);
 			return false;
 		}
-		// std::cout<<to_be_broadcast<<std::endl;
+		// std::cout<<"Activity "<<i<<' '<<ack_count[i]<<' '<<nack_count[i]<<std::endl;
+		// std::cout<<to_be_broadcast<<' '<<inds.size()<<std::endl;
 		if(inds.size() >= std::min(8ul, to_be_broadcast) and to_be_broadcast > 0){
 			to_be_broadcast -= inds.size();
 			return true;
 		}
         if(active_proposal_ts[i] == 0 or (ack_count[i] + nack_count[i] > n / 2)){
+			// std::cout<<i<<std::endl;
+			// std::cout<<nack_count[i]<<std::endl;
 			inds.push_back(i);
 			ack_count[i] = 0;
 			nack_count[i] = 0;

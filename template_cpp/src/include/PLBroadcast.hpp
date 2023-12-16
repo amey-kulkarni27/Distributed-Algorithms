@@ -53,8 +53,7 @@ public:
 		// response ACK/NACK to the sender
 		const std::lock_guard<std::mutex> lock(broadcastLock);
 		std::string stubMsg = std::to_string(pl_ids[h_id]) + "_" + responseMsg;
-		if(responseMsg == "R_Y_0_1_|_")
-			std::cout<<"HERE "<<stubMsg<<std::endl;
+		std::cout<<"Sending to "<<h_id<<" with pl_id "<<std::endl;
 		(this->s).sp2pSend(h_id, pl_ids[h_id], stubMsg);
 		pl_ids[h_id]++;
 	}

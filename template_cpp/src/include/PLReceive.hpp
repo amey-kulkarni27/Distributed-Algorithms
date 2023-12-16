@@ -33,14 +33,12 @@ public:
 		}
 		else{
 			std::string msg = recvMsg;
-			if(recvMsg == "1_1_R_Y_0_1_|_")
-				std::cout<<"HEY"<<std::endl;
 			size_t firstUnderscore = msg.find('_');
 			std::string plidStr = msg.substr(0, firstUnderscore);
 			size_t secondUnderscore = msg.find('_', firstUnderscore + 1);
 			std::string hidStr = msg.substr(firstUnderscore + 1, secondUnderscore - firstUnderscore - 1);
 			std::string msgWithoutSenderDetails = msg.substr(secondUnderscore + 1); // there will always be something to the right of the second underscore
-			std::string ackMsg = "A_" + hidStr + "_" + plidStr;
+			std::string ackMsg = "A_" + std::to_string(selfId) + "_" + plidStr;
 			unsigned long hid = std::stoul(hidStr);
 			(this -> fls).fp2pSend(hid, ackMsg);
 			unsigned long long plid = std::stoull(plidStr);
