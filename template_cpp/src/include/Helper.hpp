@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <set>
 #include <queue>
 #include <map>
 #include <cassert>
@@ -26,6 +27,26 @@ public:
 		std::cout<<s<<std::endl;
 	}
 
+	static void printSet(std::set<unsigned long> s){
+		if(s.empty()){
+			std::cout<<"Empty Set"<<std::endl;
+			return;
+		}
+		for(const unsigned long &x: s)
+			std::cout<<x<<' ';
+		std::cout<<std::endl;
+	}
+
+	static void printSet(std::unordered_set<unsigned long> s){
+		if(s.empty()){
+			std::cout<<"Empty Set"<<std::endl;
+			return;
+		}
+		for(const unsigned long &x: s)
+			std::cout<<x<<' ';
+		std::cout<<std::endl;
+	}
+
 	static void removeFile(const char *outPath){
 		if (std::remove(outPath) != 0) {
 				// If the file could not be removed, an error occurred
@@ -43,6 +64,23 @@ public:
 			return host;
 		assert(false);
 		return dummy;
+	}
+
+	static unsigned long getProposals(const char *configPath){
+		std::ifstream configFile(configPath);
+		unsigned long num_proposals, vs, ds;
+		if(configFile.is_open()){
+			std::string firstLine;
+			if(getline(configFile, firstLine)){
+				std::istringstream iss(firstLine);
+				if(iss>>num_proposals>>vs>>ds);
+				else
+					std::cerr<<"Failed to read in the three integers "<<std::endl;
+			}
+			else
+				std::cerr<<"Failed to read the first line "<<std::endl;
+		}
+		return num_proposals;
 	}
 
  	static void readParams (const char *configPath, unsigned long &num_proposals, unsigned long &vs, unsigned long &ds, std::vector<std::unordered_set<unsigned long>> &proposals){

@@ -16,7 +16,7 @@
 class PLReceive{
 	
 public:
-	PLReceive(FLSend &fls_, Stubborn &s_, PLBroadcast &plb, Proposer &prop_, unsigned long n, unsigned long curId): acc(plb, curId), fls(fls_), s(s_), prop(prop_), selfId(curId) {
+	PLReceive(FLSend &fls_, Stubborn &s_, PLBroadcast &plb, Proposer &prop_, unsigned long n, unsigned long curId, unsigned long num_proposals): acc(plb, curId, num_proposals), fls(fls_), s(s_), prop(prop_), selfId(curId) {
 	}
 
 	void pp2pReceive(std::string recvMsg){

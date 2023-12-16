@@ -11,17 +11,19 @@ class Logger{
 
 public:
 
-	Logger(const char *oPath, unsigned long n_): filePath(oPath), outputFile(filePath), n(n_){
+	Logger(const char *oPath, const char *cPath): filePath(oPath), outputFile(filePath){
+		num_proposals = Helper::getProposals(cPath);
+		logs.resize(num_proposals);
+		has.resize(num_proposals, false);
+		ptr = 0;
 		createFile();
-		logs.resize(n + 1);
-		has.resize(n + 1, false);
-		ptr = 1;
 	}
 
 
 	void logAndFlush(unsigned long pos, std::unordered_set<unsigned long> nums){
 		logs[pos] = nums;
-		while(ptr <= n and has[ptr]){
+		has[pos] = true;
+		while(ptr < num_proposals and has[ptr]){
 			writeNewLine(nums);
 			logs[ptr].clear();
 			ptr++;
@@ -36,7 +38,7 @@ private:
 	unsigned long ptr;
 	std::string filePath;
 	std::ofstream outputFile;
-	unsigned long n;
+	unsigned long num_proposals;
 	bool flushing = true;
 
 	void createFile(){

@@ -14,7 +14,7 @@
 class Proposer{
 
 public:
-    Proposer(const char *configPath, const char *outputPath, std::vector<Parser::Host> hosts, unsigned long curId) : plb(curId, hosts), lg(outputPath, hosts.size()), selfId(curId){
+    Proposer(const char *configPath, const char *outputPath, std::vector<Parser::Host> hosts, unsigned long curId) : plb(curId, hosts), lg(outputPath, configPath), selfId(curId){
         Helper::readParams(configPath, num_proposals, vs, ds, proposals);
         active.resize(num_proposals, true);
         active_proposal_ts.resize(num_proposals, 0); // every proposal has a time-stamp
@@ -25,7 +25,7 @@ public:
 
     }
 
-    FLSend& getFLSend(){
+	FLSend& getFLSend(){
 		return (this->plb).getFLSend();
 	}
 
@@ -41,6 +41,10 @@ public:
 		return (this->plb).getSocket();
 	}
 
+	unsigned long getProposals(){
+		return this->num_proposals;
+	}
+
     void propose(){
         // if the ts is 0, send it, otherwise check if ack_count + nack_count > n/2
         // if it is, reset the counts
@@ -48,8 +52,8 @@ public:
         while(num_active > 0){
             for(unsigned long i = 0; i < num_proposals; i++){
                 if(check(inds, i)){
-                  packAndBroadcast(inds);
-								}
+				  packAndBroadcast(inds);
+				}
             }
         }
     }
@@ -64,7 +68,7 @@ public:
         std::unordered_set<unsigned long> curSet;
         // Code to read and process the feedback
 		while(nxtPos != std::string::npos){
-			std::string betweenUnders = msg.substr(curPos, nxtPos - curPos);
+			std::string betweenUnders = responseMsg.substr(curPos, nxtPos - curPos);
 			if(betweenUnders == "|"){
                 update(ret, i, ts, curSet);
                 ret = "", cObt = false, iObt = false, tsObt = false;
@@ -120,28 +124,29 @@ private:
             }
             payload += "|_";
         }
+		inds.clear();
         (this -> plb).broadcast(payload);
     }
 
     bool check(std::vector<unsigned long> &inds, unsigned long i){
         const std::lock_guard<std::mutex> lock(proposalLock);
+		if(inds.size() >= std::min(8ul, num_active))
+			return true;
         if(!active[i])
             return false;
         if(active_proposal_ts[i] == 0 or (ack_count[i] + nack_count[i] > n / 2)){
             if(ack_count[i] > n / 2){
                 (this->lg).logAndFlush(i, proposals[i]);
-
+				num_active--;
                 active[i] = false;
+				std::cout<<num_active<<' '<<inds.size()<<std::endl;
             }
             else{
                 inds.push_back(i);
-                ack_count[i] = 0;
+                ack_count[i] = 1;
                 nack_count[i] = 0;
                 active_proposal_ts[i]++;
-                if(inds.size() >= std::min(8ul, num_active))
-                    return true;
             }
-            
         }
         return false;
     }
@@ -149,10 +154,10 @@ private:
 
 
     void update(std::string &ret, unsigned long &i, unsigned long &ts, std::unordered_set<unsigned long> toAdd){
+        const std::lock_guard<std::mutex> lock(proposalLock);
         if(ts < active_proposal_ts[i])
             return;
         assert(ts == active_proposal_ts[i]);
-        const std::lock_guard<std::mutex> lock(proposalLock);
         if(ret == "Y")
             ack_count[i]++;
         else{
