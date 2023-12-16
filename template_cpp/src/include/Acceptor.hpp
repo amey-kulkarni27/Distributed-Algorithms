@@ -34,10 +34,16 @@ public:
 				iObt = false, tsObt = false;
 				std::set<unsigned long> diffResult;
 				std::set_difference(accepteds[inds.back()].begin(), accepteds[inds.back()].end(), curSet.begin(), curSet.end(), std::inserter(diffResult, diffResult.begin()));
-				if(diffResult.empty())
+				if(diffResult.empty()){
 					returnChar.push_back("Y");
-				else
+					accepteds[inds.back()] = curSet;
+				}
+				else{
 					returnChar.push_back("N");
+					std::set<unsigned long> unionSet;
+					std::set_union(accepteds[inds.back()].begin(), accepteds[inds.back()].end(), curSet.begin(), curSet.end(), std::inserter(unionSet, unionSet.begin()));
+					accepteds[inds.back()] = unionSet;
+				}
 				toAdd.push_back(diffResult);
 				curSet.clear();
 			}
