@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cstring>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -50,7 +51,7 @@ public:
 	static void removeFile(const char *outPath){
 		if (std::remove(outPath) != 0) {
 				// If the file could not be removed, an error occurred
-				std::cerr << "Error deleting the file" << std::endl;
+				std::perror("Error deleting the file");
 		} else {
 				// File was successfully removed
 				std::cout << "File deleted successfully" << std::endl;

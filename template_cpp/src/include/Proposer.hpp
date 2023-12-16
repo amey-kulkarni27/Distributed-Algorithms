@@ -61,7 +61,7 @@ public:
 
     void response(std::string responseMsg){
 
-		// std::cout<<"Received "<<responseMsg<<std::endl;
+		std::cout<<"Received "<<responseMsg<<std::endl;
         size_t curPos = 0;
 		size_t nxtPos = responseMsg.find('_', curPos);
         bool cObt = false, iObt = false, tsObt = false;
@@ -129,7 +129,7 @@ private:
             payload += "|_";
         }
 		inds.clear();
-		// std::cout<<"Sending "<<payload<<" to all"<<std::endl;
+		std::cout<<"Sending "<<payload<<" to all"<<std::endl;
         (this -> plb).broadcast(payload);
     }
 
