@@ -43,7 +43,6 @@ public:
 			(this -> fls).fp2pSend(hid, ackMsg);
 			unsigned long long plid = std::stoull(plidStr);
 			if(delivered.find(hid) == delivered.end() || delivered[hid].find(plid) == delivered[hid].end()){
-				// std::cout<<recvMsg<<std::endl;
 				delivered[hid].insert(plid);
 				size_t underscore = msgWithoutSenderDetails.find('_');
 				if(msgWithoutSenderDetails[0] == 'P')

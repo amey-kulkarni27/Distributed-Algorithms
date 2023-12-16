@@ -61,7 +61,7 @@ public:
 
     void response(std::string responseMsg){
 
-		std::cout<<"Received "<<responseMsg<<std::endl;
+		// std::cout<<"Received "<<responseMsg<<std::endl;
         size_t curPos = 0;
 		size_t nxtPos = responseMsg.find('_', curPos);
         bool cObt = false, iObt = false, tsObt = false;
@@ -124,18 +124,16 @@ private:
             unsigned long ts = active_proposal_ts[ind];
             payload += std::to_string(ind) + "_" + std::to_string(ts) + "_";
             for(const unsigned long &num: proposals[ind]){
-				// std::cout<<num<<' '<<ind<<std::endl;
                 payload += std::to_string(num) + "_";
             }
             payload += "|_";
         }
 		inds.clear();
-		std::cout<<"Sending "<<payload<<" to all"<<std::endl;
+		// std::cout<<"Sending "<<payload<<" to all"<<std::endl;
         (this -> plb).broadcast(payload);
     }
 
     bool check(std::vector<unsigned long> &inds, unsigned long i){
-		std::this_thread::sleep_for(std::chrono::milliseconds(700));
         const std::lock_guard<std::mutex> lock(proposalLock);
         if(!active[i])
             return false;
@@ -145,15 +143,11 @@ private:
 			(this->lg).logAndFlush(i, proposals[i]);
 			return false;
 		}
-		// std::cout<<"Activity "<<i<<' '<<ack_count[i]<<' '<<nack_count[i]<<std::endl;
-		// std::cout<<to_be_broadcast<<' '<<inds.size()<<std::endl;
 		if(inds.size() >= std::min(8ul, to_be_broadcast) and to_be_broadcast > 0){
 			to_be_broadcast -= inds.size();
 			return true;
 		}
         if(active_proposal_ts[i] == 0 or (ack_count[i] + nack_count[i] > n / 2)){
-			// std::cout<<i<<std::endl;
-			// std::cout<<nack_count[i]<<std::endl;
 			inds.push_back(i);
 			ack_count[i] = 0;
 			nack_count[i] = 0;
@@ -171,7 +165,6 @@ private:
         if(ts < active_proposal_ts[i])
             return;
         assert(ts == active_proposal_ts[i]);
-		std::cout<<ret<<std::endl;
         if(ret == "Y")
             ack_count[i]++;
         else{
