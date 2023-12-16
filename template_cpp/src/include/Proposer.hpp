@@ -146,7 +146,7 @@ private:
 			(this->lg).logAndFlush(i, proposals[i]);
 			return false;
 		}
-		if(inds.size() >= std::min(8ul, to_be_broadcast) and to_be_broadcast > 0){
+		if(inds.size() >= std::min(8ul, num_active) and num_active > 0){
 			to_be_broadcast -= inds.size();
 			return true;
 		}
